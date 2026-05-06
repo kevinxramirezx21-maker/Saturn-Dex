@@ -242,6 +242,124 @@ function init() {
 
 // Call init at the end
 window.onload = init;
-</script>
-</body>
-</html>
+<script>
+// === BASIC VARIABLES ===
+let markets = []; 
+let currentMarket = null;
+let tradeSide = 'long';
+let leverage = 20;
+let isConnected = false;
+let publicKey = null;        // This will hold your wallet address
+let provider = null;         // This will hold the wallet (Phantom, Backpack, etc.)
+let theme = 'dark';
+let priceHistory = [];
+let activePredictions = [];
+
+// === LIVE PRICES (from CoinGecko) ===
+async function fetchLivePrices() {
+  try {
+    const symbols = ['bitcoin','ethereum','solana','binancecoin','dogecoin'];
+    const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${symbols.join(',')}&vs_currencies=usd&include_24hr_change=true`);
+    const data = await res.json();
+
+    markets = [
+      {sym:'BTC', name:'Bitcoin', price:data.bitcoin.usd, chg:parseFloat(data.bitcoin.usd_24h_change?.toFixed(2)||0), vol:'$42B', type:'PERP'},
+      {sym:'ETH', name:'Ethereum', price:data.ethereum.usd, chg:parseFloat(data.ethereum.usd_24h_change?.toFixed(2)||0), vol:'$21B', type:'PERP'},
+      {sym:'SOL', name:'Solana', price:data.solana.usd, chg:parseFloat(data.solana.usd_24h_change?.toFixed(2)||0), vol:'$4.8B', type:'PERP'},
+      {sym:'BNB', name:'BNB', price:data.binancecoin.usd, chg:parseFloat(data.binancecoin.usd_24h_change?.toFixed(2)||0), vol:'$1.9B', type:'PERP'},
+      {sym:'DOGE', name:'Dogecoin', price:data.dogecoin.usd, chg:parseFloat(data.dogecoin.usd_24h_change?.toFixed(2)||0), vol:'$1.2B', type:'PERP'},
+    ];
+
+    if (!currentMarket) currentMarket = markets[0];
+    renderMarketList();
+    updateTickerBar();
+    renderOrderBook();
+    initChart();
+    populatePredAssetSelect();
+  } catch(e) {
+    console.error("Price fetch failed", e);
+  }
+}
+
+// === REAL WALLET CONNECTION ===
+const MAINNET_RPC = "https://api.mainnet-beta.solana.com";
+
+async function getProvider(name) {
+  if (name === "Phantom" && window.solana?.isPhantom) return window.solana;
+  if (name === "Backpack" && window.backpack) return window.backpack;
+  if (name === "Solflare" && window.solflare) return window.solflare;
+  alert("Please install Phantom or Backpack wallet to connect.");
+  return null;
+}
+
+async function connectWallet(name) {
+  provider = await getProvider(name);
+  if (!provider) return;
+
+  try {
+    const resp = await provider.connect();
+    publicKey = resp.publicKey;
+    isConnected = true;
+
+    // Get real SOL balance
+    const connection = new solanaWeb3.Connection(MAINNET_RPC);
+    const solBalance = await connection.getBalance(publicKey);
+    const solFormatted = (solBalance / 1_000_000_000).toFixed(4);
+
+    closeModal('walletModal');
+    showNotif('✅', 'Wallet Connected', `${name} • ${publicKey.toString().slice(0,4)}...${publicKey.toString().slice(-4)}`);
+
+    // Update top bar and balance display
+    document.querySelector('.topbar-btn.primary-btn').innerHTML = `🟢 ${name} • ${solFormatted} SOL`;
+    document.querySelector('.connect-notice').style.display = 'none';
+    document.querySelector('.balance-val').textContent = `${solFormatted} SOL`;
+
+  } catch (err) {
+    console.error(err);
+    showNotif('❌', 'Connection Failed', 'Please try again or check your wallet');
+  }
+}
+
+// === PLACE ORDER (currently shows demo, ready for Drift) ===
+function placeOrder() {
+  if (!isConnected) {
+    openWallet();
+    return;
+  }
+  showNotif('🚀', 'Order Ready', `Preparing ${tradeSide.toUpperCase()} ${currentMarket.sym} ${leverage}× ...`);
+  // We will add real Drift trading here in the next step
+}
+
+// === KEEP ALL YOUR ORIGINAL FUNCTIONS BELOW ===
+function init() {
+  fetchLivePrices();
+  setInterval(fetchLivePrices, 30000);   // refresh prices every 30 seconds
+
+  renderMarketList();
+  renderOrderBook();
+  renderTickerList();
+  initChart();
+  populatePredAssetSelect();
+  updatePredStrike();
+}
+
+function populatePredAssetSelect() {
+  const sel = document.getElementById('predAsset');
+  if (!sel) return;
+  sel.innerHTML = markets.map(m => `<option value="${m.sym}">${m.sym}/USDT</option>`).join('');
+  sel.onchange = updatePredStrike;
+}
+
+function updatePredStrike() {
+  const sym = document.getElementById('predAsset').value;
+  const m = markets.find(x => x.sym === sym);
+  if (m) {
+    const strike = (m.price * (Math.random()*0.004 + 0.998)).toFixed(m.price > 100 ? 2 : 6);
+    document.getElementById('predStrike').value = strike;
+  }
+}
+
+// ... (All your other original functions stay exactly the same: toggleTheme, openApp, renderMarketList, drawChart, setSide, placePrediction, renderActivePreds, etc.)
+
+// Make sure these lines are at the very end of the script:
+window.onload = init;
