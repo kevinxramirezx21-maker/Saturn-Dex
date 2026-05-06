@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Saturn DEX — The Next-Gen Perp DEX</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  /* DARK MODE — Black & Purple */
+  --bg-primary: #080810;
+  --bg-secondary: #0d0d1a;
+  --bg-tertiary: #111120;
+  --bg-panel: #0f0f1e;
+  --bg-card: #141428;
+  --bg-hover: #1a1a32;
+  --bg-input: #0c0c1c;
+  --border-color: #2a2a4a;
+  --border-accent: #6c2bd9;
+  --accent-primary: #8b3dff;
+  --accent-secondary: #6c2bd9;
+  --accent-glow: rgba(139,61,255,0.3);
+  --accent-glow-strong: rgba(139,61,255,0.6);
+  --purple-light: #a855f7;
+  --purple-dim: #7c3aed;
+  --text-primary: #f0f0ff;
+  --text-secondary: #a0a0c0;
+  --text-muted: #606080;
+  --text-accent: #c084fc;
+  --green: #00e676;
+  --green-dim: rgba(0,230,118,0.15);
+  --red: #ff3d71;
+  --red-dim: rgba(255,61,113,0.15);
+  --yellow: #ffd600;
+  --chart-bg: #0a0a18;
+  --scrollbar-thumb: #2a2a4a;
+  --shadow-glow: 0 0 30px rgba(139,61,255,0.15);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.5);
+}
+
+[data-theme="light"] {
+  --bg-primary: #f0eeff;
+  --bg-secondary: #f7f5ff;
+  --bg-tertiary: #ede9ff;
+  --bg-panel: #f9f8ff;
+  --bg-card: #ffffff;
+  --bg-hover: #ede8ff;
+  --bg-input: #f4f0ff;
+  --border-color: #d4c8f0;
+  --border-accent: #8b3dff;
+  --accent-primary: #7c3aed;
+  --accent-secondary: #6c2bd9;
+  --accent-glow: rgba(124,58,237,0.15);
+  --accent-glow-strong: rgba(124,58,237,0.35);
+  --purple-light: #7c3aed;
+  --purple-dim: #6d28d9;
+  --text-primary: #1a0a3a;
+  --text-secondary: #4a3a6a;
+  --text-muted: #9080b0;
+  --text-accent: #7c3aed;
+  --green: #059669;
+  --green-dim: rgba(5,150,105,0.12);
+  --red: #dc2626;
+  --red-dim: rgba(220,38,38,0.12);
+  --yellow: #d97706;
+  --chart-bg: #eeeaff;
+  --scrollbar-thumb: #c4b5fd;
+  --shadow-glow: 0 0 30px rgba(124,58,237,0.1);
+  --shadow-card: 0 4px 24px rgba(100,60,200,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
+
+/* ═══════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════ */
+#landing {
+  display: block;
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+/* NAV */
+.land-nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+  height: 64px;
+  background: rgba(8,8,16,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
+}
+[data-theme="light"] .land-nav { background: rgba(240,238,255,0.9); }
+.land-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800; font-size: 22px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.land-logo .ring {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2.5px solid var(--accent-primary);
+  box-shadow: 0 0 12px var(--accent-glow-strong), inset 0 0 8px var(--accent-glow);
+  position: relative;
+  animation: rotatering 8s linear infinite;
+}
+.land-logo .ring::after {
+  content:'';
+  position:absolute; top:50%; left:-8px; right:-8px; height:1.5px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  transform: translateY(-50%);
+}
+@keyframes rotatering { to { transform: rotate(360deg); } }
+.land-nav-links { display:flex; gap:32px; align-items:center; }
+.land-nav-links a {
+  color: var(--text-secondary); text-decoration:none; font-size:14px; font-weight:500;
+  transition: color 0.2s;
+}
+.land-nav-links a:hover { color: var(--text-primary); }
+.land-nav-right { display:flex; gap:12px; align-items:center; }
+.btn-launch {
+  background: linear-gradient(135deg, var(--accent-primary), var(--purple-dim));
+  color: #fff; border:none; cursor:pointer;
+  padding: 10px 24px; border-radius: 8px;
+  font-family: 'Orbitron', monospace; font-size: 12px; font-weight:700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 20px var(--accent-glow);
+  transition: all 0.2s;
+}
+.btn-launch:hover { transform: translateY(-1px); box-shadow: 0 0 30px var(--accent-glow-strong); }
+.theme-toggle-btn {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  color: var(--text-secondary); cursor:pointer; width:36px; height:36px;
+  border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-size:16px; transition: all 0.2s;
+}
+.theme-toggle-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+/* HERO */
+.hero {
+  padding: 160px 48px 120px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg {
+  position:absolute; inset:0; z-index:0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139,61,255,0.15) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 20% 50%, rgba(108,43,217,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 40% at 80% 60%, rgba(168,85,247,0.06) 0%, transparent 60%);
+}
+[data-theme="light"] .hero-bg {
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139,61,255,0.1) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 20% 50%, rgba(108,43,217,0.05) 0%, transparent 60%);
+}
+.hero-stars {
+  position:absolute; inset:0; z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(139,61,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 40%, rgba(168,85,247,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 30%, rgba(139,61,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 55%, rgba(168,85,247,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,0.2) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 80%, rgba(139,61,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,0.25) 0%, transparent 100%),
+    radial-gradient(2px 2px at 90% 20%, rgba(139,61,255,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 5% 85%, rgba(168,85,247,0.5) 0%, transparent 100%);
+}
+[data-theme="light"] .hero-stars { opacity: 0.3; }
+.hero-content { position:relative; z-index:1; }
+.hero-tag {
+  display: inline-flex; align-items:center; gap:8px;
+  background: rgba(139,61,255,0.12); border: 1px solid rgba(139,61,255,0.3);
+  color: var(--text-accent); font-size:13px; font-weight:500;
+  padding: 6px 16px; border-radius:50px;
+  margin-bottom: 28px;
+}
+.hero-tag span { width:6px; height:6px; border-radius:50%; background:var(--accent-primary); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.hero h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 900; line-height: 1.1;
+  background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-primary) 70%, var(--purple-light) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 24px;
+}
+.hero-sub {
+  font-size: 18px; color: var(--text-secondary);
+  max-width: 560px; margin: 0 auto 40px; line-height: 1.6;
+}
+.hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), var(--purple-dim));
+  color: #fff; border:none; cursor:pointer;
+  padding: 14px 36px; border-radius: 10px;
+  font-family: 'Orbitron', monospace; font-size: 13px; font-weight:700;
+  letter-spacing: 1px;
+  box-shadow: 0 0 30px var(--accent-glow), 0 8px 24px rgba(0,0,0,0.3);
+  transition: all 0.25s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--accent-glow-strong), 0 12px 32px rgba(0,0,0,0.4); }
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary); border: 1px solid var(--border-color); cursor:pointer;
+  padding: 14px 36px; border-radius: 10px;
+  font-family: 'Orbitron', monospace; font-size: 13px; font-weight:700;
+  letter-spacing: 1px; transition: all 0.25s;
+}
+.btn-secondary:hover { border-color: var(--accent-primary); color: var(--accent-primary); background: var(--accent-glow); }
+
+/* STATS BAR */
+.stats-bar {
+  background: var(--bg-card); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
+  padding: 24px 48px;
+  display: flex; justify-content: center; gap: 80px; flex-wrap:wrap;
+}
+.stat-item { text-align:center; }
+.stat-value {
+  font-family:'Orbitron',monospace; font-size:28px; font-weight:800;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; letter-spacing:0.5px; }
+
+/* FEATURES */
+.features {
+  padding: 100px 48px;
+  max-width: 1200px; margin: 0 auto;
+}
+.section-title {
+  text-align:center; margin-bottom:60px;
+  font-family:'Orbitron',monospace; font-size:32px; font-weight:800;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.features-grid {
+  display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:24px;
+}
+.feat-card {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius:16px; padding:28px;
+  transition: all 0.3s; position:relative; overflow:hidden;
+}
+.feat-card::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(135deg, var(--accent-glow), transparent);
+  opacity:0; transition: opacity 0.3s;
+}
+.feat-card:hover { border-color: var(--border-accent); transform: translateY(-4px); box-shadow: var(--shadow-glow); }
+.feat-card:hover::before { opacity:1; }
+.feat-icon {
+  width:48px; height:48px; border-radius:12px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--purple-dim));
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; margin-bottom:16px;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.feat-card h3 { font-size:16px; font-weight:700; margin-bottom:8px; position:relative; }
+.feat-card p { font-size:14px; color:var(--text-secondary); line-height:1.6; position:relative; }
+
+/* PARTNERS */
+.partners {
+  padding: 60px 48px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  text-align:center;
+  overflow:hidden;
+}
+.partners h2 { font-family:'Orbitron',monospace; font-size:14px; font-weight:600; color:var(--text-muted); letter-spacing:2px; margin-bottom:32px; }
+.partners-track {
+  display:flex; gap:48px; align-items:center;
+  animation: scroll 20s linear infinite;
+  width: max-content;
+}
+@keyframes scroll { to { transform: translateX(-50%); } }
+.partner-pill {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  padding: 10px 24px; border-radius:50px;
+  font-size:14px; font-weight:600; color:var(--text-secondary);
+  white-space:nowrap;
+}
+
+/* LAND FOOTER */
+.land-footer {
+  background: var(--bg-secondary); border-top: 1px solid var(--border-color);
+  padding: 40px 48px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+}
+.land-footer p { font-size:13px; color:var(--text-muted); }
+.footer-links { display:flex; gap:24px; }
+.footer-links a { font-size:13px; color:var(--text-muted); text-decoration:none; transition:color 0.2s; }
+.footer-links a:hover { color:var(--accent-primary); }
+
+/* CTA SECTION */
+.cta-section {
+  padding: 100px 48px; text-align:center;
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  position:relative; overflow:hidden;
+}
+.cta-section::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(139,61,255,0.08) 0%, transparent 70%);
+}
+.cta-section h2 {
+  font-family:'Orbitron',monospace; font-size:48px; font-weight:900;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:8px; position:relative;
+}
+.cta-section h3 { font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:300; color:var(--text-secondary); margin-bottom:40px; position:relative; }
+
+
+/* ═══════════════════════════════════════
+   TRADING APP
+═══════════════════════════════════════ */
+#app {
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* TOP BAR */
+.topbar {
+  height: 48px; min-height:48px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex; align-items: center;
+  padding: 0 16px;
+  gap: 0;
+  z-index: 50;
+}
+.topbar-logo {
+  display:flex; align-items:center; gap:8px;
+  font-family:'Orbitron',monospace; font-weight:800; font-size:16px;
+  color:var(--text-primary); text-decoration:none;
+  padding-right:20px; border-right:1px solid var(--border-color);
+  cursor:pointer;
+}
+.topbar-logo .ring {
+  width:22px; height:22px; border-radius:50%;
+  border:2px solid var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-glow-strong);
+  position:relative; animation:rotatering 8s linear infinite;
+}
+.topbar-logo .ring::after {
+  content:''; position:absolute; top:50%; left:-4px; right:-4px; height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent-primary),transparent);
+  transform:translateY(-50%);
+}
+.ticker-selector {
+  display:flex; align-items:center; gap:12px;
+  padding: 0 20px; cursor:pointer;
+  border-right:1px solid var(--border-color); height:100%;
+}
+.ticker-selector:hover { background:var(--bg-hover); }
+.ticker-pair { font-family:'Orbitron',monospace; font-weight:700; font-size:15px; }
+.ticker-type {
+  background: rgba(139,61,255,0.2); color:var(--accent-primary);
+  font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px;
+  letter-spacing:0.5px;
+}
+.ticker-stats { display:flex; gap:24px; padding:0 20px; flex:1; overflow:hidden; }
+.tick-item { display:flex; flex-direction:column; gap:1px; min-width:90px; }
+.tick-label { font-size:10px; color:var(--text-muted); letter-spacing:0.3px; }
+.tick-value { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:500; }
+.tick-value.up { color:var(--green); }
+.tick-value.down { color:var(--red); }
+.topbar-right {
+  display:flex; align-items:center; gap:8px;
+  padding-left:16px; border-left:1px solid var(--border-color);
+}
+.topbar-btn {
+  background:transparent; border:1px solid var(--border-color);
+  color:var(--text-secondary); cursor:pointer;
+  padding:6px 14px; border-radius:6px; font-size:12px; font-weight:600;
+  transition:all 0.2s; display:flex; align-items:center; gap:6px;
+}
+.topbar-btn:hover { border-color:var(--accent-primary); color:var(--accent-primary); }
+.topbar-btn.primary-btn {
+  background:linear-gradient(135deg,var(--accent-primary),var(--purple-dim));
+  border-color:transparent; color:#fff;
+  box-shadow:0 0 12px var(--accent-glow);
+}
+.topbar-btn.primary-btn:hover { box-shadow:0 0 20px var(--accent-glow-strong); color:#fff; }
+.icon-btn {
+  background:transparent; border:1px solid var(--border-color);
+  color:var(--text-secondary); cursor:pointer; width:30px; height:30px;
+  border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:14px;
+  transition:all 0.2s;
+}
+.icon-btn:hover { border-color:var(--accent-primary); color:var(--accent-primary); }
+
+/* MAIN LAYOUT */
+.main-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 300px;
+  grid-template-rows: 1fr auto;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* LEFT: MARKET LIST */
+.market-list {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.market-search {
+  padding:10px 12px; border-bottom:1px solid var(--border-color);
+}
+.market-search input {
+  width:100%; background:var(--bg-input); border:1px solid var(--border-color);
+  color:var(--text-primary); padding:7px 10px; border-radius:6px; font-size:12px;
+  font-family:'Space Grotesk',sans-serif; outline:none;
+}
+.market-search input:focus { border-color:var(--accent-primary); }
+.market-search input::placeholder { color:var(--text-muted); }
+.market-tabs {
+  display:flex; border-bottom:1px solid var(--border-color);
+}
+.market-tab {
+  flex:1; padding:8px; text-align:center; font-size:11px; font-weight:600;
+  color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent;
+  transition:all 0.2s;
+}
+.market-tab.active { color:var(--accent-primary); border-bottom-color:var(--accent-primary); }
+.market-items { overflow-y:auto; flex:1; }
+.market-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 12px; cursor:pointer; border-bottom:1px solid rgba(42,42,74,0.3);
+  transition:background 0.15s;
+}
+.market-item:hover { background:var(--bg-hover); }
+.market-item.active { background:rgba(139,61,255,0.1); border-left:2px solid var(--accent-primary); }
+.mi-left { display:flex; align-items:center; gap:8px; }
+.mi-icon {
+  width:26px; height:26px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-primary),var(--purple-dim));
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff;
+}
+.mi-name { font-size:12px; font-weight:700; }
+.mi-vol { font-size:10px; color:var(--text-muted); }
+.mi-right { text-align:right; }
+.mi-price { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }
+.mi-chg { font-size:10px; font-weight:600; }
+.mi-chg.up { color:var(--green); }
+.mi-chg.down { color:var(--red); }
+
+/* CENTER: CHART + TABS */
+.chart-area {
+  display:flex; flex-direction:column; overflow:hidden;
+  border-right:1px solid var(--border-color);
+}
+.chart-tabs {
+  display:flex; align-items:center; gap:0;
+  background:var(--bg-secondary); border-bottom:1px solid var(--border-color);
+  padding:0 16px; height:38px; gap:4px;
+}
+.chart-tab {
+  padding:4px 12px; font-size:12px; font-weight:600; color:var(--text-muted);
+  cursor:pointer; border-radius:6px; border:1px solid transparent; transition:all 0.2s;
+}
+.chart-tab.active { color:var(--accent-primary); background:rgba(139,61,255,0.1); border-color:rgba(139,61,255,0.3); }
+.timeframe-btns { display:flex; gap:2px; margin-left:auto; }
+.tf-btn {
+  padding:4px 8px; font-size:11px; font-weight:600; color:var(--text-muted);
+  cursor:pointer; border-radius:4px; border:none; background:transparent; transition:all 0.2s;
+}
+.tf-btn.active { color:var(--accent-primary); background:rgba(139,61,255,0.12); }
+.tf-btn:hover { color:var(--text-primary); }
+.chart-container {
+  flex:1; background:var(--chart-bg); position:relative; overflow:hidden;
+}
+.chart-canvas { width:100%; height:100%; }
+.chart-overlay {
+  position:absolute; top:16px; left:16px;
+  display:flex; flex-direction:column; gap:4px;
+}
+.chart-price-big {
+  font-family:'Orbitron',monospace; font-size:28px; font-weight:800;
+  color:var(--green); text-shadow:0 0 20px rgba(0,230,118,0.3);
+}
+[data-theme="light"] .chart-price-big { text-shadow:none; }
+.chart-price-sub { font-size:12px; color:var(--text-muted); font-family:'JetBrains Mono',monospace; }
+
+/* ORDERBOOK + TRADES */
+.order-section {
+  background:var(--bg-secondary);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.ob-tabs { display:flex; border-bottom:1px solid var(--border-color); }
+.ob-tab {
+  flex:1; padding:10px; text-align:center; font-size:12px; font-weight:600;
+  color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s;
+}
+.ob-tab.active { color:var(--accent-primary); border-bottom-color:var(--accent-primary); }
+.ob-header {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  padding:6px 12px; font-size:10px; color:var(--text-muted); letter-spacing:0.3px;
+  border-bottom:1px solid var(--border-color);
+}
+.ob-header span:nth-child(2) { text-align:center; }
+.ob-header span:nth-child(3) { text-align:right; }
+.ob-entries { flex:1; overflow-y:auto; }
+.ob-entry {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  padding:3px 12px; cursor:pointer; position:relative; transition:background 0.1s;
+}
+.ob-entry:hover { background:var(--bg-hover); }
+.ob-entry-bg {
+  position:absolute; top:0; bottom:0; right:0;
+  opacity:0.08; pointer-events:none;
+}
+.ob-entry.ask .ob-entry-bg { background:var(--red); }
+.ob-entry.bid .ob-entry-bg { background:var(--green); }
+.ob-price { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; }
+.ob-price.ask { color:var(--red); }
+.ob-price.bid { color:var(--green); }
+.ob-size { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-secondary); text-align:center; }
+.ob-total { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-muted); text-align:right; }
+.ob-spread {
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  padding:5px 12px; background:var(--bg-card); border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color);
+}
+.spread-price { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--green); }
+.spread-pct { font-size:11px; color:var(--text-muted); }
+
+/* RIGHT PANEL */
+.right-panel {
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.trade-form {
+  background:var(--bg-panel); border-left:1px solid var(--border-color);
+  padding:14px; display:flex; flex-direction:column; gap:10px;
+}
+.ls-tabs { display:flex; gap:0; border-radius:8px; overflow:hidden; border:1px solid var(--border-color); }
+.ls-tab {
+  flex:1; padding:9px; text-align:center; font-size:12px; font-weight:700;
+  cursor:pointer; transition:all 0.2s; letter-spacing:0.5px;
+  border:none; background:transparent; color:var(--text-muted);
+}
+.ls-tab.long.active { background:linear-gradient(135deg,#00a86b,#009960); color:#fff; }
+.ls-tab.short.active { background:linear-gradient(135deg,var(--red),#cc2255); color:#fff; }
+.ls-tab:hover:not(.active) { background:var(--bg-hover); color:var(--text-primary); }
+.form-row { display:flex; gap:8px; }
+.order-type-select {
+  flex:1; background:var(--bg-input); border:1px solid var(--border-color);
+  color:var(--text-primary); padding:7px 10px; border-radius:7px; font-size:12px;
+  font-family:'Space Grotesk',sans-serif; outline:none; cursor:pointer;
+  transition:border-color 0.2s;
+}
+.order-type-select:focus { border-color:var(--accent-primary); }
+.leverage-badge {
+  background:rgba(139,61,255,0.15); border:1px solid rgba(139,61,255,0.4);
+  color:var(--accent-primary); padding:7px 12px; border-radius:7px; font-size:12px; font-weight:700;
+  cursor:pointer; white-space:nowrap; font-family:'JetBrains Mono',monospace;
+}
+.leverage-badge:hover { background:rgba(139,61,255,0.25); }
+.input-group { position:relative; }
+.input-group label { font-size:10px; color:var(--text-muted); display:block; margin-bottom:4px; letter-spacing:0.3px; }
+.input-group input {
+  width:100%; background:var(--bg-input); border:1px solid var(--border-color);
+  color:var(--text-primary); padding:8px 50px 8px 10px; border-radius:7px; font-size:13px;
+  font-family:'JetBrains Mono',monospace; outline:none; transition:border-color 0.2s;
+}
+.input-group input:focus { border-color:var(--accent-primary); }
+.input-suffix {
+  position:absolute; right:10px; top:50%; transform:translateY(50%);
+  font-size:11px; color:var(--text-muted); pointer-events:none;
+}
+.slider-track { position:relative; padding:8px 0; }
+.slider-track input[type=range] {
+  width:100%; -webkit-appearance:none; height:3px;
+  background:linear-gradient(90deg,var(--accent-primary) 25%,var(--border-color) 25%);
+  border-radius:3px; outline:none; cursor:pointer;
+}
+.slider-track input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+  background:var(--accent-primary); cursor:pointer;
+  box-shadow:0 0 8px var(--accent-glow-strong);
+}
+.slider-pcts { display:flex; justify-content:space-between; margin-top:4px; }
+.slider-pcts span {
+  font-size:10px; color:var(--text-muted); cursor:pointer; padding:2px 4px; border-radius:3px;
+  transition:all 0.2s;
+}
+.slider-pcts span:hover { color:var(--accent-primary); background:rgba(139,61,255,0.1); }
+.form-info { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.fi-item { display:flex; flex-direction:column; gap:2px; }
+.fi-label { font-size:10px; color:var(--text-muted); }
+.fi-value { font-size:12px; font-weight:600; font-family:'JetBrains Mono',monospace; }
+.btn-trade {
+  width:100%; padding:13px; border:none; cursor:pointer;
+  border-radius:8px; font-family:'Orbitron',monospace; font-size:13px; font-weight:700;
+  letter-spacing:1px; transition:all 0.2s;
+}
+.btn-trade.long {
+  background:linear-gradient(135deg,#00c77a,#009960);
+  color:#fff; box-shadow:0 0 20px rgba(0,199,122,0.3);
+}
+.btn-trade.short {
+  background:linear-gradient(135deg,var(--red),#cc2255);
+  color:#fff; box-shadow:0 0 20px rgba(255,61,113,0.3);
+}
+.btn-trade:hover { transform:translateY(-1px); filter:brightness(1.1); }
+.balance-row { display:flex; justify-content:space-between; font-size:11px; }
+.balance-label { color:var(--text-muted); }
+.balance-val { font-family:'JetBrains Mono',monospace; color:var(--text-primary); font-weight:600; }
+.connect-notice {
+  text-align:center; padding:8px; font-size:11px; color:var(--text-muted);
+  background:rgba(139,61,255,0.05); border-radius:6px; border:1px solid rgba(139,61,255,0.15);
+}
+
+/* POSITIONS / BOTTOM BAR */
+.bottom-bar {
+  background:var(--bg-secondary); border-top:1px solid var(--border-color);
+  grid-column:1/-1; height:200px; min-height:200px;
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.bottom-tabs { display:flex; border-bottom:1px solid var(--border-color); padding:0 16px; }
+.bottom-tab {
+  padding:8px 16px; font-size:12px; font-weight:600; color:var(--text-muted);
+  cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s;
+}
+.bottom-tab.active { color:var(--accent-primary); border-bottom-color:var(--accent-primary); }
+.bottom-content { flex:1; overflow-y:auto; padding:0 16px; }
+.positions-table { width:100%; border-collapse:collapse; }
+.positions-table th {
+  font-size:11px; color:var(--text-muted); font-weight:600; padding:8px 8px;
+  text-align:left; border-bottom:1px solid var(--border-color); white-space:nowrap;
+}
+.positions-table td {
+  font-size:12px; padding:8px; border-bottom:1px solid rgba(42,42,74,0.3);
+  font-family:'JetBrains Mono',monospace;
+}
+.pos-badge {
+  padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; font-family:'Space Grotesk',sans-serif;
+}
+.pos-badge.long { background:var(--green-dim); color:var(--green); }
+.pos-badge.short { background:var(--red-dim); color:var(--red); }
+.pos-lev { color:var(--accent-primary); font-size:10px; margin-left:4px; }
+.pnl-pos { color:var(--green); }
+.pnl-neg { color:var(--red); }
+.close-btn {
+  background:transparent; border:1px solid var(--border-color); color:var(--text-muted);
+  padding:3px 10px; border-radius:4px; cursor:pointer; font-size:11px; transition:all 0.2s;
+}
+.close-btn:hover { border-color:var(--red); color:var(--red); }
+.empty-state {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  height:120px; gap:8px; color:var(--text-muted); font-size:13px;
+}
+.empty-state .es-icon { font-size:32px; opacity:0.3; }
+
+/* SETTINGS MODAL */
+.modal-overlay {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,0.7); backdrop-filter:blur(4px);
+  display:none; align-items:center; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--bg-card); border:1px solid var(--border-color);
+  border-radius:16px; width:420px; max-width:90vw;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5), var(--shadow-glow);
+  overflow:hidden;
+}
+.modal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 20px; border-bottom:1px solid var(--border-color);
+}
+.modal-title { font-family:'Orbitron',monospace; font-size:16px; font-weight:700; }
+.modal-close {
+  background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:18px;
+  width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+  border-radius:6px; transition:all 0.2s;
+}
+.modal-close:hover { background:var(--bg-hover); color:var(--text-primary); }
+.modal-body { padding:20px; display:flex; flex-direction:column; gap:20px; }
+.setting-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px; background:var(--bg-panel); border-radius:10px; border:1px solid var(--border-color);
+}
+.setting-info { display:flex; flex-direction:column; gap:3px; }
+.setting-name { font-size:14px; font-weight:600; }
+.setting-desc { font-size:12px; color:var(--text-muted); }
+.toggle-switch {
+  position:relative; width:48px; height:26px; cursor:pointer;
+}
+.toggle-switch input { display:none; }
+.toggle-track {
+  position:absolute; inset:0; border-radius:13px;
+  background:var(--border-color); transition:background 0.3s;
+}
+.toggle-track::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:20px; height:20px; border-radius:50%;
+  background:#fff; transition:transform 0.3s;
+  box-shadow:0 2px 4px rgba(0,0,0,0.3);
+}
+.toggle-switch input:checked + .toggle-track { background:var(--accent-primary); }
+.toggle-switch input:checked + .toggle-track::after { transform:translateX(22px); }
+.leverage-modal-row {
+  display:flex; gap:8px; flex-wrap:wrap;
+}
+.lev-option {
+  padding:8px 14px; border-radius:8px; border:1px solid var(--border-color);
+  background:transparent; color:var(--text-secondary); cursor:pointer; font-size:13px;
+  font-family:'JetBrains Mono',monospace; font-weight:700; transition:all 0.2s;
+}
+.lev-option.active { background:rgba(139,61,255,0.2); border-color:var(--accent-primary); color:var(--accent-primary); }
+.lev-option:hover { border-color:var(--accent-primary); color:var(--accent-primary); }
+.modal-save {
+  width:100%; padding:12px; border:none; cursor:pointer; border-radius:8px;
+  background:linear-gradient(135deg,var(--accent-primary),var(--purple-dim));
+  color:#fff; font-family:'Orbitron',monospace; font-size:13px; font-weight:700;
+  letter-spacing:0.5px; box-shadow:0 0 20px var(--accent-glow); transition:all 0.2s;
+}
+.modal-save:hover { filter:brightness(1.1); transform:translateY(-1px); }
+
+/* WALLET MODAL */
+.wallet-modal .wallet-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+.wallet-option {
+  display:flex; align-items:center; gap:12px;
+  padding:14px; background:var(--bg-panel); border:1px solid var(--border-color);
+  border-radius:10px; cursor:pointer; transition:all 0.2s;
+}
+.wallet-option:hover { border-color:var(--accent-primary); background:var(--bg-hover); }
+.wallet-icon { font-size:24px; }
+.wallet-name { font-size:13px; font-weight:600; }
+.wallet-type { font-size:11px; color:var(--text-muted); }
+
+/* TICKER MODAL */
+.ticker-modal .search-input {
+  width:100%; background:var(--bg-input); border:1px solid var(--border-color);
+  color:var(--text-primary); padding:10px 14px; border-radius:8px; font-size:14px;
+  font-family:'Space Grotesk',sans-serif; outline:none; margin-bottom:16px;
+}
+.ticker-modal .search-input:focus { border-color:var(--accent-primary); }
+.ticker-list { max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; }
+.ticker-option {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; border-radius:8px; cursor:pointer; transition:background 0.15s;
+}
+.ticker-option:hover { background:var(--bg-hover); }
+.ticker-option.active { background:rgba(139,61,255,0.1); }
+.to-left { display:flex; align-items:center; gap:10px; }
+.to-icon {
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-primary),var(--purple-dim));
+  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff;
+}
+.to-name { font-size:14px; font-weight:700; }
+.to-type { font-size:11px; color:var(--text-muted); }
+.to-right { text-align:right; }
+.to-price { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; }
+.to-chg { font-size:11px; font-weight:600; }
+.to-chg.up { color:var(--green); }
+.to-chg.down { color:var(--red); }
+
+/* NOTIFICATIONS */
+.notification {
+  position:fixed; bottom:24px; right:24px; z-index:300;
+  background:var(--bg-card); border:1px solid var(--border-color);
+  border-radius:10px; padding:14px 18px; min-width:280px;
+  box-shadow:var(--shadow-card); display:none; gap:12px; align-items:center;
+  animation:slideIn 0.3s ease;
+}
+.notification.show { display:flex; }
+@keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+.notif-icon { font-size:20px; }
+.notif-text { flex:1; }
+.notif-title { font-size:13px; font-weight:700; }
+.notif-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.notif-close { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; }
+
+/* RESPONSIVE */
+@media(max-width:1000px) {
+  .main-layout { grid-template-columns:0 1fr 280px; }
+  .market-list { display:none; }
+}
+@media(max-width:700px) {
+  .main-layout { grid-template-columns:1fr; grid-template-rows:1fr auto 340px; }
+  .chart-area { grid-column:1; }
+  .right-panel { grid-column:1; }
+  .ticker-stats { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LANDING PAGE ═══════════ -->
+<div id="landing">
+
+  <nav class="land-nav">
+    <a class="land-logo" href="#" onclick="return false;">
+      <div class="ring"></div>
+      SATURN
+    </a>
+    <div class="land-nav-links">
+      <a href="#" onclick="openApp();return false;">Trade</a>
+      <a href="#">Portfolio</a>
+      <a href="#">Referral</a>
+      <a href="#">Rewards</a>
+    </div>
+    <div class="land-nav-right">
+      <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light/Dark Mode" id="landThemeBtn">☀️</button>
+      <button class="btn-launch" onclick="openApp()">LAUNCH APP</button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-stars"></div>
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span></span>
+        Now Live on Solana · Multi-Chain Coming Soon
+      </div>
+      <h1>Decentralized<br/>Perpetual Contracts</h1>
+      <p class="hero-sub">Non-custodial perpetuals trading built for all — whether you're new to crypto or a seasoned pro. Trade and keep full control of your assets.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="openApp()">LAUNCH APP</button>
+        <button class="btn-secondary" onclick="openApp()">VIEW MARKETS</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value" id="statVol">$1.03T</div>
+      <div class="stat-label">TOTAL TRADING VOLUME</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">2.31M</div>
+      <div class="stat-label">USERS</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">$0.46B</div>
+      <div class="stat-label">OPEN INTEREST</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">$0.28B</div>
+      <div class="stat-label">TVL</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">45</div>
+      <div class="stat-label">SYMBOLS</div>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="section-title">Why Saturn DEX</div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🔗</div>
+        <h3>Cross-Chain Trading</h3>
+        <p>No bridging or switching. Just pick a chain and place a trade. Solana-native with BNB Chain integration coming soon.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💧</div>
+        <h3>Unmatched Liquidity</h3>
+        <p>Access deep liquidity pooled across markets to support large, confident trades without slippage.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🛠️</div>
+        <h3>Advanced Tools</h3>
+        <p>Use powerful tools like hidden orders, advanced charting, and AI-powered agents — built for control and edge.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔒</div>
+        <h3>Non-Custodial</h3>
+        <p>Your keys, your crypto. Saturn never holds your funds. Full self-custody at every step of the trade.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">👁️</div>
+        <h3>Hidden Orders</h3>
+        <p>Place limit orders that stay fully hidden from the public order book. Size and direction remain private.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🤖</div>
+        <h3>Saturn Agents</h3>
+        <p>Deploy AI trading bots from the Saturn Agents marketplace. Six specialized agents with distinct strategies.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="partners">
+    <h2>ECOSYSTEM PARTNERS</h2>
+    <div style="overflow:hidden;">
+      <div class="partners-track">
+        <div class="partner-pill">Jupiter</div>
+        <div class="partner-pill">Helius</div>
+        <div class="partner-pill">DexScreener</div>
+        <div class="partner-pill">Phantom</div>
+        <div class="partner-pill">Solflare</div>
+        <div class="partner-pill">Backpack</div>
+        <div class="partner-pill">Raydium</div>
+        <div class="partner-pill">Orca</div>
+        <div class="partner-pill">pump.fun</div>
+        <div class="partner-pill">Jito</div>
+        <!-- duplicate for seamless scroll -->
+        <div class="partner-pill">Jupiter</div>
+        <div class="partner-pill">Helius</div>
+        <div class="partner-pill">DexScreener</div>
+        <div class="partner-pill">Phantom</div>
+        <div class="partner-pill">Solflare</div>
+        <div class="partner-pill">Backpack</div>
+        <div class="partner-pill">Raydium</div>
+        <div class="partner-pill">Orca</div>
+        <div class="partner-pill">pump.fun</div>
+        <div class="partner-pill">Jito</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <h2>Trade Smarter.</h2>
+    <h3>Earn More.</h3>
+    <button class="btn-primary" onclick="openApp()">LAUNCH SATURN DEX</button>
+  </div>
+
+  <footer class="land-footer">
+    <div class="land-logo" style="font-size:14px; cursor:default;">
+      <div class="ring" style="width:20px;height:20px;"></div>
+      SATURN DEX
+    </div>
+    <p>© 2026 Saturn Protocol. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="#">X / Twitter</a>
+      <a href="#">Telegram</a>
+      <a href="#">Discord</a>
+      <a href="#">GitHub</a>
+      <a href="#">Docs</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ═══════════ TRADING APP ═══════════ -->
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <a class="topbar-logo" onclick="closeApp()">
+      <div class="ring"></div>
+      SATURN
+    </a>
+
+    <div class="ticker-selector" onclick="openTickerModal()">
+      <div>
+        <div class="ticker-pair" id="currentPair">BTC/USDT</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <span class="ticker-type">PERP</span>
+        </div>
+      </div>
+      <span style="color:var(--text-muted);font-size:10px;">▼</span>
+    </div>
+
+    <div class="ticker-stats">
+      <div class="tick-item">
+        <div class="tick-label">MARK PRICE</div>
+        <div class="tick-value up" id="markPrice">$105,234.50</div>
+      </div>
+      <div class="tick-item">
+        <div class="tick-label">INDEX</div>
+        <div class="tick-value" id="indexPrice">$105,198.30</div>
+      </div>
+      <div class="tick-item">
+        <div class="tick-label">24H CHANGE</div>
+        <div class="tick-value up" id="priceChange">+2.34%</div>
+      </div>
+      <div class="tick-item">
+        <div class="tick-label">24H HIGH</div>
+        <div class="tick-value" id="high24h">$107,800</div>
+      </div>
+      <div class="tick-item">
+        <div class="tick-label">24H LOW</div>
+        <div class="tick-value" id="low24h">$102,100</div>
+      </div>
+      <div class="tick-item">
+        <div class="tick-label">24H VOLUME</div>
+        <div class="tick-value">$4.2B</div>
+      </div>
+      <div class="tick-item">
+        <div class="tick-label">FUNDING</div>
+        <div class="tick-value up">+0.0082%</div>
+      </div>
+      <div class="tick-item">
+        <div class="tick-label">OPEN INT.</div>
+        <div class="tick-value">$12.4B</div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="openSettings()">⚙️ Settings</button>
+      <button class="topbar-btn primary-btn" onclick="openWallet()">🔌 Connect</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-layout">
+
+    <!-- LEFT: MARKET LIST -->
+    <div class="market-list">
+      <div class="market-search">
+        <input type="text" placeholder="🔍 Search markets..." oninput="filterMarkets(this.value)"/>
+      </div>
+      <div class="market-tabs">
+        <div class="market-tab active">All</div>
+        <div class="market-tab">Crypto</div>
+        <div class="market-tab">Stocks</div>
+      </div>
+      <div class="market-items" id="marketItems"></div>
+    </div>
+
+    <!-- CENTER: CHART -->
+    <div class="chart-area">
+      <div class="chart-tabs">
+        <div class="chart-tab active">Chart</div>
+        <div class="chart-tab">Depth</div>
+        <div class="chart-tab">Funding</div>
+        <div class="timeframe-btns">
+          <button class="tf-btn" onclick="setTF(this,'1m')">1m</button>
+          <button class="tf-btn" onclick="setTF(this,'5m')">5m</button>
+          <button class="tf-btn" onclick="setTF(this,'15m')">15m</button>
+          <button class="tf-btn active" onclick="setTF(this,'1h')">1h</button>
+          <button class="tf-btn" onclick="setTF(this,'4h')">4h</button>
+          <button class="tf-btn" onclick="setTF(this,'1d')">1d</button>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas class="chart-canvas" id="chartCanvas"></canvas>
+        <div class="chart-overlay">
+          <div class="chart-price-big" id="chartPrice">$105,234.50</div>
+          <div class="chart-price-sub" id="chartSub">+$2,418.20  (+2.34%)  ·  1H</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDER BOOK -->
+    <div class="order-section">
+      <div class="ob-tabs">
+        <div class="ob-tab active">Order Book</div>
+        <div class="ob-tab">Trades</div>
+      </div>
+      <div class="ob-header">
+        <span>Price (USDT)</span><span>Size (BTC)</span><span>Total</span>
+      </div>
+      <div class="ob-entries" id="askEntries" style="flex:1;overflow-y:auto;max-height:200px;"></div>
+      <div class="ob-spread">
+        <span class="spread-price" id="spreadPrice">$105,234.50</span>
+        <span class="spread-pct">Spread: 0.01%</span>
+      </div>
+      <div class="ob-entries" id="bidEntries" style="flex:1;overflow-y:auto;max-height:200px;"></div>
+    </div>
+
+    <!-- RIGHT: TRADE FORM -->
+    <div class="right-panel">
+      <div class="trade-form" style="overflow-y:auto;">
+        <div class="ls-tabs">
+          <button class="ls-tab long active" id="longBtn" onclick="setSide('long')">LONG</button>
+          <button class="ls-tab short" id="shortBtn" onclick="setSide('short')">SHORT</button>
+        </div>
+
+        <div class="form-row">
+          <select class="order-type-select" id="orderType">
+            <option>Market</option>
+            <option>Limit</option>
+            <option>Stop Market</option>
+            <option>Stop Limit</option>
+            <option>TWAP</option>
+            <option>Scaled</option>
+          </select>
+          <div class="leverage-badge" onclick="openSettings()">
+            <span id="levDisplay">20×</span>
+          </div>
+        </div>
+
+        <div class="input-group" id="priceInputGroup" style="display:none;">
+          <label>Price</label>
+          <input type="number" id="priceInput" value="105234.50" placeholder="0.00"/>
+          <div class="input-suffix">USDT</div>
+        </div>
+
+        <div class="input-group">
+          <label>Size</label>
+          <input type="number" id="sizeInput" value="0.01" placeholder="0.00"/>
+          <div class="input-suffix">BTC</div>
+        </div>
+
+        <div class="input-group">
+          <label>Notional</label>
+          <input type="number" id="notionalInput" value="1052.35" placeholder="0.00"/>
+          <div class="input-suffix">USDT</div>
+        </div>
+
+        <div class="slider-track">
+          <input type="range" min="0" max="100" value="25" id="sizeSlider" oninput="updateSlider(this)"/>
+          <div class="slider-pcts">
+            <span onclick="setSlider(0)">0%</span>
+            <span onclick="setSlider(25)">25%</span>
+            <span onclick="setSlider(50)">50%</span>
+            <span onclick="setSlider(75)">75%</span>
+            <span onclick="setSlider(100)">100%</span>
+          </div>
+        </div>
+
+        <div class="form-info">
+          <div class="fi-item">
+            <div class="fi-label">Est. Liq. Price</div>
+            <div class="fi-value" id="liqPrice">$99,422.18</div>
+          </div>
+          <div class="fi-item">
+            <div class="fi-label">Est. Margin</div>
+            <div class="fi-value">$52.62</div>
+          </div>
+          <div class="fi-item">
+            <div class="fi-label">Trade Fee</div>
+            <div class="fi-value">$0.105</div>
+          </div>
+          <div class="fi-item">
+            <div class="fi-label">Max Leverage</div>
+            <div class="fi-value" style="color:var(--accent-primary)">100×</div>
+          </div>
+        </div>
+
+        <div class="balance-row">
+          <span class="balance-label">Available Balance</span>
+          <span class="balance-val">0.00 USDT</span>
+        </div>
+
+        <button class="btn-trade long" id="tradeBtn" onclick="placeOrder()">
+          LONG BTC/USDT
+        </button>
+
+        <div class="connect-notice">
+          🔌 Connect wallet to start trading
+        </div>
+
+        <!-- TP/SL toggle -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-top:1px solid var(--border-color);padding-top:10px;">
+          <span style="font-size:12px;font-weight:600;color:var(--text-secondary);">TP/SL</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tpslToggle" onchange="toggleTPSL()"/>
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div id="tpslInputs" style="display:none;gap:8px;flex-direction:column;">
+          <div class="input-group">
+            <label>Take Profit</label>
+            <input type="number" placeholder="0.00"/>
+            <div class="input-suffix">USDT</div>
+          </div>
+          <div class="input-group">
+            <label>Stop Loss</label>
+            <input type="number" placeholder="0.00"/>
+            <div class="input-suffix">USDT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: POSITIONS -->
+    <div class="bottom-bar">
+      <div class="bottom-tabs">
+        <div class="bottom-tab active">Positions (1)</div>
+        <div class="bottom-tab">Open Orders (0)</div>
+        <div class="bottom-tab">Order History</div>
+        <div class="bottom-tab">Trade History</div>
+        <div class="bottom-tab">Assets</div>
+      </div>
+      <div class="bottom-content">
+        <table class="positions-table" id="posTable">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Side</th>
+              <th>Size</th>
+              <th>Entry Price</th>
+              <th>Mark Price</th>
+              <th>Liq. Price</th>
+              <th>Margin</th>
+              <th>uPnL</th>
+              <th>ROE%</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="positionsBody">
+            <tr>
+              <td>BTC/USDT</td>
+              <td><span class="pos-badge long">LONG</span><span class="pos-lev">20×</span></td>
+              <td>0.01 BTC</td>
+              <td>$103,800.00</td>
+              <td class="pnl-pos" id="posMarkPrice">$105,234.50</td>
+              <td>$98,610.00</td>
+              <td>$51.90</td>
+              <td class="pnl-pos" id="posPnl">+$14.35</td>
+              <td class="pnl-pos" id="posRoe">+27.6%</td>
+              <td>
+                <button class="close-btn" onclick="closePosition()">Close</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- end main-layout -->
+</div><!-- end app -->
+
+<!-- ═══════════ MODALS ═══════════ -->
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">⚙️ Settings</span>
+      <button class="modal-close" onclick="closeModal('settingsModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-name">🌙 Light Mode</div>
+          <div class="setting-desc">Switch between dark (black/purple) and light (white/purple) themes</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="lightModeToggle" onchange="toggleThemeFromSettings()"/>
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-name">🔔 Trade Notifications</div>
+          <div class="setting-desc">Show notifications for fills, liquidations, and funding</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="notifToggle" checked/>
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-info">
+          <div class="setting-name">📊 Order Confirmation</div>
+          <div class="setting-desc">Show confirmation dialog before placing orders</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="confirmToggle"/>
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div>
+        <div class="fi-label" style="margin-bottom:10px;font-size:13px;font-weight:600;color:var(--text-primary);">Default Leverage</div>
+        <div class="leverage-modal-row" id="levOptions">
+          <button class="lev-option" onclick="setLev(1,this)">1×</button>
+          <button class="lev-option" onclick="setLev(2,this)">2×</button>
+          <button class="lev-option" onclick="setLev(5,this)">5×</button>
+          <button class="lev-option" onclick="setLev(10,this)">10×</button>
+          <button class="lev-option active" onclick="setLev(20,this)">20×</button>
+          <button class="lev-option" onclick="setLev(50,this)">50×</button>
+          <button class="lev-option" onclick="setLev(100,this)">100×</button>
+        </div>
+      </div>
+      <button class="modal-save" onclick="closeModal('settingsModal')">SAVE SETTINGS</button>
+    </div>
+  </div>
+</div>
+
+<!-- Wallet Modal -->
+<div class="modal-overlay" id="walletModal">
+  <div class="modal wallet-modal">
+    <div class="modal-header">
+      <span class="modal-title">🔌 Connect Wallet</span>
+      <button class="modal-close" onclick="closeModal('walletModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="wallet-grid">
+        <div class="wallet-option" onclick="connectWallet('Phantom')">
+          <div class="wallet-icon">👻</div>
+          <div><div class="wallet-name">Phantom</div><div class="wallet-type">Solana</div></div>
+        </div>
+        <div class="wallet-option" onclick="connectWallet('Solflare')">
+          <div class="wallet-icon">🔥</div>
+          <div><div class="wallet-name">Solflare</div><div class="wallet-type">Solana</div></div>
+        </div>
+        <div class="wallet-option" onclick="connectWallet('Backpack')">
+          <div class="wallet-icon">🎒</div>
+          <div><div class="wallet-name">Backpack</div><div class="wallet-type">Solana</div></div>
+        </div>
+        <div class="wallet-option" onclick="connectWallet('Coinbase')">
+          <div class="wallet-icon">🔵</div>
+          <div><div class="wallet-name">Coinbase</div><div class="wallet-type">Multi-chain</div></div>
+        </div>
+        <div class="wallet-option" onclick="connectWallet('Trust')">
+          <div class="wallet-icon">🛡️</div>
+          <div><div class="wallet-name">Trust Wallet</div><div class="wallet-type">Multi-chain</div></div>
+        </div>
+        <div class="wallet-option" onclick="connectWallet('Brave')">
+          <div class="wallet-icon">🦁</div>
+          <div><div class="wallet-name">Brave</div><div class="wallet-type">Multi-chain</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ticker Modal -->
+<div class="modal-overlay" id="tickerModal">
+  <div class="modal ticker-modal">
+    <div class="modal-header">
+      <span class="modal-title">📊 Select Market</span>
+      <button class="modal-close" onclick="closeModal('tickerModal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:10px;">
+      <input class="search-input" type="text" placeholder="🔍 Search symbol..." oninput="filterTickers(this.value)"/>
+      <div class="ticker-list" id="tickerList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Notification -->
+<div class="notification" id="notification">
+  <div class="notif-icon" id="notifIcon">✅</div>
+  <div class="notif-text">
+    <div class="notif-title" id="notifTitle">Order Placed</div>
+    <div class="notif-sub" id="notifSub">Your order has been submitted.</div>
+  </div>
+  <button class="notif-close" onclick="hideNotif()">✕</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const markets = [
+  {sym:'BTC',name:'Bitcoin',price:105234.50,chg:2.34,vol:'$4.2B',type:'PERP',active:true},
+  {sym:'ETH',name:'Ethereum',price:3842.20,chg:1.87,vol:'$2.1B',type:'PERP'},
+  {sym:'SOL',name:'Solana',price:178.40,chg:-0.92,vol:'$890M',type:'PERP'},
+  {sym:'BNB',name:'BNB Chain',price:612.80,chg:3.21,vol:'$540M',type:'PERP'},
+  {sym:'DOGE',name:'Dogecoin',price:0.3812,chg:5.44,vol:'$320M',type:'PERP'},
+  {sym:'PEPE',name:'Pepe',price:0.00001842,chg:-2.11,vol:'$280M',type:'PERP'},
+  {sym:'WIF',name:'dogwifhat',price:1.243,chg:8.77,vol:'$210M',type:'PERP'},
+  {sym:'BONK',name:'Bonk',price:0.0000312,chg:12.4,vol:'$190M',type:'PERP'},
+  {sym:'AVAX',name:'Avalanche',price:34.72,chg:-1.44,vol:'$180M',type:'PERP'},
+  {sym:'LINK',name:'Chainlink',price:14.88,chg:0.66,vol:'$160M',type:'PERP'},
+  {sym:'AAPL',name:'Apple Inc',price:214.30,chg:0.82,vol:'$98M',type:'STOCK'},
+  {sym:'TSLA',name:'Tesla',price:178.90,chg:-1.23,vol:'$85M',type:'STOCK'},
+  {sym:'NVDA',name:'NVIDIA',price:132.40,chg:2.18,vol:'$110M',type:'STOCK'},
+];
+
+let currentMarket = markets[0];
+let tradeSide = 'long';
+let leverage = 20;
+let isConnected = false;
+let animFrame;
+let priceHistory = [];
+let currentPrice = 105234.50;
+let theme = 'dark';
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+  renderMarketList();
+  renderOrderBook();
+  renderTickerList();
+  initChart();
+  startPriceTick();
+  // order type show/hide price
+  document.getElementById('orderType').addEventListener('change', function(){
+    document.getElementById('priceInputGroup').style.display = 
+      this.value !== 'Market' ? 'flex' : 'none';
+    if(document.getElementById('priceInputGroup').style.display==='flex')
+      document.getElementById('priceInputGroup').style.flexDirection='column';
+  });
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function openApp() {
+  document.getElementById('landing').style.display='none';
+  document.getElementById('app').style.display='flex';
+  setTimeout(()=>{ initChart(); },100);
+}
+function closeApp() {
+  document.getElementById('app').style.display='none';
+  document.getElementById('landing').style.display='block';
+}
+
+// ═══════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════
+function toggleTheme() {
+  theme = theme==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('landThemeBtn').textContent = theme==='light' ? '🌙' : '☀️';
+  const toggle = document.getElementById('lightModeToggle');
+  if(toggle) toggle.checked = theme==='light';
+  initChart();
+}
+function toggleThemeFromSettings() {
+  const checked = document.getElementById('lightModeToggle').checked;
+  theme = checked ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('landThemeBtn').textContent = theme==='light' ? '🌙' : '☀️';
+  initChart();
+}
+
+// ═══════════════════════════════════════
+// MARKET LIST
+// ═══════════════════════════════════════
+function renderMarketList(filter='') {
+  const container = document.getElementById('marketItems');
+  const filtered = markets.filter(m =>
+    m.sym.toLowerCase().includes(filter.toLowerCase()) ||
+    m.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  container.innerHTML = filtered.map(m => `
+    <div class="market-item${m.sym===currentMarket.sym?' active':''}" onclick="selectMarket('${m.sym}')">
+      <div class="mi-left">
+        <div class="mi-icon">${m.sym.slice(0,2)}</div>
+        <div>
+          <div class="mi-name">${m.sym}/USDT</div>
+          <div class="mi-vol">${m.vol}</div>
+        </div>
+      </div>
+      <div class="mi-right">
+        <div class="mi-price" style="color:${m.chg>=0?'var(--green)':'var(--red)'}">${fmtPrice(m.price)}</div>
+        <div class="mi-chg ${m.chg>=0?'up':'down'}">${m.chg>=0?'+':''}${m.chg}%</div>
+      </div>
+    </div>
+  `).join('');
+}
+function filterMarkets(v) { renderMarketList(v); }
+function selectMarket(sym) {
+  currentMarket = markets.find(m=>m.sym===sym);
+  currentPrice = currentMarket.price;
+  renderMarketList();
+  updateTickerBar();
+  renderOrderBook();
+  document.getElementById('currentPair').textContent = sym+'/USDT';
+  document.getElementById('tradeBtn').textContent = `${tradeSide.toUpperCase()} ${sym}/USDT`;
+  priceHistory = [];
+  initChart();
+  closeModal('tickerModal');
+}
+
+function fmtPrice(p) {
+  if(p>=1000) return '$'+p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(p>=1) return '$'+p.toFixed(4);
+  if(p>=0.0001) return '$'+p.toFixed(6);
+  return '$'+p.toFixed(8);
+}
+
+// ═══════════════════════════════════════
+// TICKER BAR
+// ═══════════════════════════════════════
+function updateTickerBar() {
+  const p = currentPrice;
+  const fmt = fmtPrice(p);
+  document.getElementById('markPrice').textContent = fmt;
+  document.getElementById('indexPrice').textContent = fmtPrice(p*0.9997);
+  document.getElementById('chartPrice').textContent = fmt;
+  document.getElementById('spreadPrice').textContent = fmt;
+  const chg = currentMarket.chg;
+  const el = document.getElementById('priceChange');
+  el.textContent = (chg>=0?'+':'')+chg+'%';
+  el.className = 'tick-value '+(chg>=0?'up':'down');
+  document.getElementById('posMarkPrice').textContent = fmt;
+}
+
+// ═══════════════════════════════════════
+// ORDER BOOK
+// ═══════════════════════════════════════
+function renderOrderBook() {
+  const p = currentPrice;
+  const asks = [];
+  const bids = [];
+  for(let i=0;i<12;i++){
+    const askP = p*(1+0.0001*(i+1)+Math.random()*0.0001);
+    const bidP = p*(1-0.0001*(i+1)-Math.random()*0.0001);
+    const sz = (Math.random()*2+0.01).toFixed(3);
+    asks.push({price:askP,size:sz,total:(askP*sz).toFixed(0)});
+    bids.push({price:bidP,size:sz,total:(bidP*sz).toFixed(0)});
+  }
+  asks.sort((a,b)=>a.price-b.price);
+  bids.sort((a,b)=>b.price-a.price);
+  const maxAsk = Math.max(...asks.map(a=>parseFloat(a.size)));
+  const maxBid = Math.max(...bids.map(b=>parseFloat(b.size)));
+  document.getElementById('askEntries').innerHTML = asks.map(a=>`
+    <div class="ob-entry ask">
+      <div class="ob-entry-bg" style="width:${(parseFloat(a.size)/maxAsk*100).toFixed(0)}%"></div>
+      <div class="ob-price ask">${fmtPrice(a.price)}</div>
+      <div class="ob-size">${a.size}</div>
+      <div class="ob-total">$${a.total}</div>
+    </div>`).join('');
+  document.getElementById('bidEntries').innerHTML = bids.map(b=>`
+    <div class="ob-entry bid">
+      <div class="ob-entry-bg" style="width:${(parseFloat(b.size)/maxBid*100).toFixed(0)}%"></div>
+      <div class="ob-price bid">${fmtPrice(b.price)}</div>
+      <div class="ob-size">${b.size}</div>
+      <div class="ob-total">$${b.total}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════
+// CHART
+// ═══════════════════════════════════════
+function initChart() {
+  const canvas = document.getElementById('chartCanvas');
+  if(!canvas) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width || 800;
+  canvas.height = rect.height || 400;
+  if(priceHistory.length===0) {
+    let p = currentMarket.price*0.98;
+    for(let i=0;i<80;i++){
+      p += (Math.random()-0.48)*p*0.003;
+      priceHistory.push(p);
+    }
+    priceHistory.push(currentPrice);
+  }
+  drawChart();
+}
+function drawChart() {
+  const canvas = document.getElementById('chartCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const isDark = theme==='dark';
+  ctx.clearRect(0,0,w,h);
+  // BG
+  ctx.fillStyle = isDark ? '#0a0a18' : '#eeeaff';
+  ctx.fillRect(0,0,w,h);
+  // Grid
+  ctx.strokeStyle = isDark ? 'rgba(42,42,74,0.5)' : 'rgba(180,160,240,0.3)';
+  ctx.lineWidth=1;
+  for(let i=0;i<=8;i++){
+    const y = h*i/8;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+  for(let i=0;i<=12;i++){
+    const x = w*i/12;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+  }
+  // Candles
+  const pad=60,data=priceHistory;
+  const n=Math.min(data.length,60);
+  const slice=data.slice(-n);
+  const minP=Math.min(...slice)*0.998;
+  const maxP=Math.max(...slice)*1.002;
+  const rangeP=maxP-minP;
+  const candleW=Math.floor((w-pad)/(n+1)*0.6);
+  const candleGap=Math.floor((w-pad)/(n+1));
+  // price labels
+  ctx.fillStyle = isDark ? 'rgba(150,130,200,0.7)' : 'rgba(100,60,180,0.8)';
+  ctx.font = '10px JetBrains Mono, monospace';
+  for(let i=0;i<=4;i++){
+    const pv = minP+rangeP*i/4;
+    const y = h-(h*(pv-minP)/rangeP);
+    ctx.fillText(fmtPrice(pv),4,y-2);
+  }
+  // draw candles
+  for(let i=0;i<slice.length-1;i++){
+    const open=slice[i], close=slice[i+1];
+    const high=Math.max(open,close)*(1+Math.random()*0.002);
+    const low=Math.min(open,close)*(1-Math.random()*0.002);
+    const x=pad+i*candleGap;
+    const isUp=close>=open;
+    const green=isDark?'#00e676':'#059669';
+    const red=isDark?'#ff3d71':'#dc2626';
+    const color=isUp?green:red;
+    const openY=h-(h*(open-minP)/rangeP);
+    const closeY=h-(h*(close-minP)/rangeP);
+    const highY=h-(h*(high-minP)/rangeP);
+    const lowY=h-(h*(low-minP)/rangeP);
+    ctx.strokeStyle=color; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x+candleW/2,highY); ctx.lineTo(x+candleW/2,lowY); ctx.stroke();
+    ctx.fillStyle=color;
+    ctx.fillRect(x,Math.min(openY,closeY),candleW,Math.max(1,Math.abs(closeY-openY)));
+  }
+  // glow on last candle
+  const last=slice[slice.length-1];
+  const lx=pad+(slice.length-1)*candleGap;
+  const ly=h-(h*(last-minP)/rangeP);
+  ctx.beginPath();
+  ctx.arc(lx+candleW/2,ly,4,0,Math.PI*2);
+  ctx.fillStyle=isDark?'#a855f7':'#7c3aed';
+  ctx.fill();
+  ctx.shadowBlur=12; ctx.shadowColor='#8b3dff';
+  ctx.fill();
+  ctx.shadowBlur=0;
+}
+
+// ═══════════════════════════════════════
+// PRICE TICK
+// ═══════════════════════════════════════
+function startPriceTick() {
+  setInterval(()=>{
+    // update all market prices
+    markets.forEach(m=>{
+      m.price *= (1+(Math.random()-0.499)*0.0006);
+    });
+    currentPrice = currentMarket.price;
+    priceHistory.push(currentPrice);
+    if(priceHistory.length>200) priceHistory.shift();
+    updateTickerBar();
+    renderOrderBook();
+    drawChart();
+    // update PnL
+    const entry=103800;
+    const pnl=(currentPrice-entry)*0.01;
+    const roe=(pnl/51.9)*100;
+    document.getElementById('posPnl').textContent=(pnl>=0?'+':'')+'$'+Math.abs(pnl).toFixed(2);
+    document.getElementById('posPnl').className=pnl>=0?'pnl-pos':'pnl-neg';
+    document.getElementById('posRoe').textContent=(roe>=0?'+':'')+roe.toFixed(1)+'%';
+    document.getElementById('posRoe').className=roe>=0?'pnl-pos':'pnl-neg';
+    renderMarketList();
+  },800);
+}
+
+// ═══════════════════════════════════════
+// TRADE FORM
+// ═══════════════════════════════════════
+function setSide(side) {
+  tradeSide = side;
+  document.getElementById('longBtn').classList.toggle('active',side==='long');
+  document.getElementById('shortBtn').classList.toggle('active',side==='short');
+  const btn=document.getElementById('tradeBtn');
+  btn.className='btn-trade '+side;
+  btn.textContent=`${side.toUpperCase()} ${currentMarket.sym}/USDT`;
+}
+function updateSlider(el){
+  const pct=el.value;
+  const style=`linear-gradient(90deg,var(--accent-primary) ${pct}%,var(--border-color) ${pct}%)`;
+  el.style.background=style;
+}
+function setSlider(v){
+  const sl=document.getElementById('sizeSlider');
+  sl.value=v; updateSlider(sl);
+}
+function setTF(el,tf){
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('chartSub').textContent = `${currentMarket.chg>=0?'+':''}${(currentPrice*currentMarket.chg/100).toFixed(2)}  (${currentMarket.chg>=0?'+':''}${currentMarket.chg}%)  ·  ${tf.toUpperCase()}`;
+}
+function toggleTPSL(){
+  const el=document.getElementById('tpslInputs');
+  el.style.display=document.getElementById('tpslToggle').checked?'flex':'none';
+}
+function setLev(n, btn){
+  leverage=n;
+  document.getElementById('levDisplay').textContent=n+'×';
+  document.querySelectorAll('.lev-option').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function placeOrder(){
+  if(!isConnected){ openWallet(); return; }
+  showNotif('✅','Order Placed',`${tradeSide.toUpperCase()} ${currentMarket.sym}/USDT · ${leverage}× leverage`);
+}
+function closePosition(){
+  showNotif('💰','Position Closed','BTC/USDT position closed at market price');
+}
+
+// ═══════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════
+function openSettings(){ document.getElementById('settingsModal').classList.add('open'); }
+function openWallet(){ document.getElementById('walletModal').classList.add('open'); }
+function openTickerModal(){ 
+  renderTickerList();
+  document.getElementById('tickerModal').classList.add('open'); 
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click',e=>{
+  if(e.target.classList.contains('modal-overlay')) closeModal(e.target.id);
+});
+
+function connectWallet(name){
+  isConnected=true;
+  closeModal('walletModal');
+  showNotif('👻','Wallet Connected',`${name} connected successfully`);
+  document.querySelector('.topbar-btn.primary-btn').textContent='🟢 '+name.slice(0,4)+'...f3a2';
+  document.querySelector('.connect-notice').style.display='none';
+}
+
+function renderTickerList(filter='') {
+  const list = document.getElementById('tickerList');
+  const filtered = markets.filter(m =>
+    m.sym.toLowerCase().includes(filter.toLowerCase()) ||
+    m.name.toLowerCase().includes(filter.toLowerCase())
+  );
+  list.innerHTML = filtered.map(m=>`
+    <div class="ticker-option${m.sym===currentMarket.sym?' active':''}" onclick="selectMarket('${m.sym}')">
+      <div class="to-left">
+        <div class="to-icon">${m.sym.slice(0,2)}</div>
+        <div>
+          <div class="to-name">${m.sym}/USDT</div>
+          <div class="to-type">${m.type} · ${m.vol}</div>
+        </div>
+      </div>
+      <div class="to-right">
+        <div class="to-price" style="color:${m.chg>=0?'var(--green)':'var(--red)'}">${fmtPrice(m.price)}</div>
+        <div class="to-chg ${m.chg>=0?'up':'down'}">${m.chg>=0?'+':''}${m.chg}%</div>
+      </div>
+    </div>
+  `).join('');
+}
+function filterTickers(v){ renderTickerList(v); }
+
+// ═══════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════
+let notifTimer;
+function showNotif(icon,title,sub){
+  document.getElementById('notifIcon').textContent=icon;
+  document.getElementById('notifTitle').textContent=title;
+  document.getElementById('notifSub').textContent=sub;
+  const n=document.getElementById('notification');
+  n.classList.add('show');
+  clearTimeout(notifTimer);
+  notifTimer=setTimeout(hideNotif,4000);
+}
+function hideNotif(){ document.getElementById('notification').classList.remove('show'); }
+
+// ═══════════════════════════════════════
+// MARKET TABS
+// ═══════════════════════════════════════
+document.querySelectorAll('.market-tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.market-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+document.querySelectorAll('.ob-tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.ob-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+document.querySelectorAll('.chart-tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+document.querySelectorAll('.bottom-tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.bottom-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// RESIZE
+window.addEventListener('resize',()=>{ if(document.getElementById('app').style.display!=='none') initChart(); });
+
+// GO
+init();
+</script>
+</body>
+</html>
