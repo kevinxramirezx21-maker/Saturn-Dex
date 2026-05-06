@@ -10,7 +10,7 @@
         :root {
             --bg-primary: #0a0a1f;
             --accent-primary: #8b3dff;
-            --accent-glow: rgba(139, 61, 255, 0.4);
+            --accent-glow: rgba(139, 61, 255, 0.5);
             --text-primary: #f0f0ff;
             --text-secondary: #c0b0ff;
         }
@@ -20,77 +20,87 @@
         body {
             font-family: 'Space Grotesk', sans-serif;
             color: var(--text-primary);
-            background: var(--bg-primary);
-            overflow-x: hidden;
+            background: #0a0a1f;
+            overflow: hidden;
             height: 100vh;
             position: relative;
         }
 
-        /* Epic Saturn Background */
+        /* Space Background with Stars */
         .space-bg {
             position: fixed;
             inset: 0;
-            background: 
-                radial-gradient(circle at 30% 40%, rgba(139, 61, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 70% 60%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
-                #0a0a1f;
-            z-index: -2;
-            overflow: hidden;
+            background: radial-gradient(circle at 30% 20%, rgba(139,61,255,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(168,85,247,0.06) 0%, transparent 60%);
+            z-index: -3;
         }
 
+        .stars {
+            position: fixed;
+            inset: 0;
+            background: transparent;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Realistic Saturn */
         .saturn-container {
             position: absolute;
             top: 50%;
             left: 50%;
+            width: 620px;
+            height: 620px;
             transform: translate(-50%, -50%);
-            width: 520px;
-            height: 520px;
             z-index: -1;
-            animation: float 25s ease-in-out infinite;
+            animation: float 28s ease-in-out infinite;
         }
 
         .saturn {
             position: absolute;
-            width: 320px;
-            height: 320px;
-            top: 100px;
-            left: 100px;
-            background: radial-gradient(circle at 40% 40%, #d4a017, #b07a0f 60%, #8c5a00);
+            width: 360px;
+            height: 360px;
+            top: 130px;
+            left: 130px;
+            background: radial-gradient(circle at 38% 35%, #f4d9a8, #d4b07a 45%, #b38a5c 70%, #8c5f3a);
             border-radius: 50%;
             box-shadow: 
-                0 0 80px #ffd700,
-                inset 0 0 60px rgba(255, 215, 0, 0.6),
-                0 0 120px rgba(139, 61, 255, 0.3);
-            animation: rotatePlanet 60s linear infinite;
+                0 0 90px #ffdd88,
+                inset 40px -30px 60px rgba(255,255,255,0.25),
+                inset -40px 30px 80px rgba(0,0,0,0.6),
+                0 0 140px rgba(139,61,255,0.35);
+            animation: rotatePlanet 80s linear infinite;
         }
 
+        /* Saturn's iconic rings - more realistic */
         .rings {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 480px;
-            height: 480px;
-            border: 28px solid rgba(255, 215, 0, 0.25);
+            width: 580px;
+            height: 580px;
+            border: 42px solid rgba(245, 220, 140, 0.35);
+            border-top-color: rgba(255, 240, 180, 0.25);
+            border-bottom-color: rgba(200, 170, 100, 0.25);
             border-radius: 50%;
-            transform: translate(-50%, -50%) rotateX(75deg);
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.4);
-            animation: rotateRings 45s linear infinite;
+            transform: translate(-50%, -50%) rotateX(78deg);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.5);
+            animation: rotateRings 50s linear infinite;
         }
 
+        /* Moons */
         .moon {
             position: absolute;
-            background: #ddd;
+            background: #e0e0e0;
             border-radius: 50%;
-            box-shadow: 0 0 15px #fff;
-            animation: orbitMoon 35s linear infinite;
+            box-shadow: 0 0 12px #fff, 0 0 20px rgba(255,255,255,0.6);
         }
 
-        .moon1 { width: 28px; height: 28px; top: 80px; left: 220px; animation-duration: 42s; }
-        .moon2 { width: 18px; height: 18px; top: 140px; left: 380px; animation-duration: 28s; background: #aaa; }
+        .moon1 { width: 34px; height: 34px; top: 90px; left: 240px; animation: orbitMoon1 48s linear infinite; }
+        .moon2 { width: 22px; height: 22px; top: 160px; left: 420px; animation: orbitMoon2 32s linear infinite; background: #ccc; }
 
         @keyframes float {
             0%, 100% { transform: translate(-50%, -52%); }
-            50% { transform: translate(-50%, -48%); }
+            50% { transform: translate(-50%, -47%); }
         }
 
         @keyframes rotatePlanet {
@@ -99,16 +109,21 @@
         }
 
         @keyframes rotateRings {
-            from { transform: translate(-50%, -50%) rotateX(75deg) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotateX(75deg) rotate(360deg); }
+            from { transform: translate(-50%, -50%) rotateX(78deg) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotateX(78deg) rotate(360deg); }
         }
 
-        @keyframes orbitMoon {
-            from { transform: rotate(0deg) translateX(180px) rotate(0deg); }
-            to { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+        @keyframes orbitMoon1 {
+            from { transform: rotate(0deg) translateX(210px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(210px) rotate(-360deg); }
         }
 
-        /* Overlay content */
+        @keyframes orbitMoon2 {
+            from { transform: rotate(0deg) translateX(160px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(160px) rotate(-360deg); }
+        }
+
+        /* Content */
         .content {
             position: relative;
             z-index: 10;
@@ -123,57 +138,61 @@
 
         h1 {
             font-family: 'Orbitron', monospace;
-            font-size: 4.5rem;
+            font-size: 5rem;
             font-weight: 900;
-            background: linear-gradient(90deg, #c084fc, #8b3dff, #a855f7);
+            background: linear-gradient(90deg, #e0bbff, #a855f7, #8b3dff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
-            text-shadow: 0 0 40px rgba(139, 61, 255, 0.6);
+            text-shadow: 0 0 50px rgba(139, 61, 255, 0.7);
+            margin-bottom: 10px;
         }
 
         p {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: var(--text-secondary);
-            max-width: 620px;
-            margin-bottom: 40px;
+            max-width: 680px;
+            margin-bottom: 50px;
         }
 
         .btn {
             background: linear-gradient(135deg, #8b3dff, #6c2bd9);
             color: white;
             border: none;
-            padding: 16px 36px;
-            margin: 12px;
-            border-radius: 12px;
-            font-size: 1.1rem;
+            padding: 18px 40px;
+            margin: 15px;
+            border-radius: 14px;
+            font-size: 1.15rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 0 30px rgba(139, 61, 255, 0.5);
+            box-shadow: 0 0 35px rgba(139, 61, 255, 0.6);
         }
 
         .btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 0 50px rgba(139, 61, 255, 0.8);
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 0 60px rgba(139, 61, 255, 0.9);
         }
 
         #status {
-            margin-top: 30px;
+            margin-top: 40px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            min-height: 28px;
         }
     </style>
 </head>
 <body>
 
-    <div class="space-bg">
-        <div class="saturn-container">
-            <div class="saturn"></div>
-            <div class="rings"></div>
-            <div class="moon moon1"></div>
-            <div class="moon moon2"></div>
-        </div>
+    <div class="space-bg"></div>
+    
+    <!-- Twinkling Stars -->
+    <div class="stars" id="stars"></div>
+
+    <div class="saturn-container">
+        <div class="saturn"></div>
+        <div class="rings"></div>
+        <div class="moon moon1"></div>
+        <div class="moon moon2"></div>
     </div>
 
     <div class="content">
@@ -181,7 +200,7 @@
         <p>Perpetual Futures & Prediction Markets on Solana</p>
         
         <div>
-            <button class="btn" onclick="connectWallet()">🔌 Connect Wallet (Phantom / Backpack)</button>
+            <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
             <button class="btn" onclick="placeTestOrder()">🚀 Place Test Perp Order</button>
         </div>
 
@@ -189,6 +208,33 @@
     </div>
 
     <script>
+        // Create twinkling stars
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 180; i++) {
+                const star = document.createElement('div');
+                star.style.position = 'absolute';
+                star.style.background = 'white';
+                star.style.borderRadius = '50%';
+                star.style.opacity = Math.random() * 0.8 + 0.2;
+                star.style.width = star.style.height = Math.random() * 2.5 + 'px';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animation = `twinkle ${Math.random() * 4 + 3}s infinite alternate`;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Twinkle animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes twinkle {
+                0% { opacity: 0.3; }
+                100% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
         let isConnected = false;
         let publicKey = null;
 
@@ -196,11 +242,9 @@
             const status = document.getElementById('status');
             let wallet = null;
 
-            if (window.solana && window.solana.isPhantom) {
-                wallet = window.solana;
-            } else if (window.backpack) {
-                wallet = window.backpack;
-            } else {
+            if (window.solana && window.solana.isPhantom) wallet = window.solana;
+            else if (window.backpack) wallet = window.backpack;
+            else {
                 status.innerHTML = '❌ Please install Phantom or Backpack wallet';
                 status.style.color = '#ff3d71';
                 return;
@@ -213,7 +257,7 @@
                 status.innerHTML = `✅ Connected: ${publicKey.toString().slice(0,6)}...${publicKey.toString().slice(-4)}`;
                 status.style.color = '#00e676';
             } catch (err) {
-                status.innerHTML = '❌ Connection cancelled or failed';
+                status.innerHTML = '❌ Connection cancelled';
                 status.style.color = '#ff3d71';
             }
         }
@@ -221,17 +265,17 @@
         function placeTestOrder() {
             const status = document.getElementById('status');
             if (!isConnected) {
-                status.innerHTML = 'Please connect your wallet first';
+                status.innerHTML = 'Please connect wallet first';
                 status.style.color = '#ff3d71';
                 return;
             }
-            status.innerHTML = '🚀 Test perp order prepared (real Drift integration next)';
+            status.innerHTML = '🚀 Test perp order prepared — real Drift integration next';
             status.style.color = '#00e676';
         }
 
-        // Gentle background animation boost
         window.onload = () => {
-            console.log("Saturn DEX loaded with animated planet background");
+            createStars();
+            console.log("%cSaturn DEX loaded with realistic planet background 🪐", "color:#a855f7; font-size:14px");
         };
     </script>
 </body>
