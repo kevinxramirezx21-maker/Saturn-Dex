@@ -3,101 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Saturn DEX — The Next-Gen Perp DEX</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Saturn DEX — Perpetual Futures & Prediction Markets</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <style>
-        /* === MINIMAL CSS TO MAKE IT LOOK GOOD AND WORK === */
         :root {
-            --bg-primary: #080810;
+            --bg-primary: #0a0a1f;
             --accent-primary: #8b3dff;
+            --accent-glow: rgba(139, 61, 255, 0.4);
             --text-primary: #f0f0ff;
-            --text-secondary: #a0a0c0;
-            --green: #00e676;
-            --red: #ff3d71;
+            --text-secondary: #c0b0ff;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
             font-family: 'Space Grotesk', sans-serif;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            overflow-x: hidden;
+            height: 100vh;
+            position: relative;
         }
-        h1 { font-family: 'Orbitron', monospace; color: var(--accent-primary); }
-        button {
-            background: var(--accent-primary);
+
+        /* Epic Saturn Background */
+        .space-bg {
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(139, 61, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
+                #0a0a1f;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .saturn-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 520px;
+            height: 520px;
+            z-index: -1;
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .saturn {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            top: 100px;
+            left: 100px;
+            background: radial-gradient(circle at 40% 40%, #d4a017, #b07a0f 60%, #8c5a00);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 80px #ffd700,
+                inset 0 0 60px rgba(255, 215, 0, 0.6),
+                0 0 120px rgba(139, 61, 255, 0.3);
+            animation: rotatePlanet 60s linear infinite;
+        }
+
+        .rings {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 480px;
+            height: 480px;
+            border: 28px solid rgba(255, 215, 0, 0.25);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotateX(75deg);
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.4);
+            animation: rotateRings 45s linear infinite;
+        }
+
+        .moon {
+            position: absolute;
+            background: #ddd;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #fff;
+            animation: orbitMoon 35s linear infinite;
+        }
+
+        .moon1 { width: 28px; height: 28px; top: 80px; left: 220px; animation-duration: 42s; }
+        .moon2 { width: 18px; height: 18px; top: 140px; left: 380px; animation-duration: 28s; background: #aaa; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -52%); }
+            50% { transform: translate(-50%, -48%); }
+        }
+
+        @keyframes rotatePlanet {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateRings {
+            from { transform: translate(-50%, -50%) rotateX(75deg) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotateX(75deg) rotate(360deg); }
+        }
+
+        @keyframes orbitMoon {
+            from { transform: rotate(0deg) translateX(180px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+        }
+
+        /* Overlay content */
+        .content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 4.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #c084fc, #8b3dff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            text-shadow: 0 0 40px rgba(139, 61, 255, 0.6);
+        }
+
+        p {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #8b3dff, #6c2bd9);
             color: white;
             border: none;
-            padding: 12px 24px;
-            margin: 10px;
-            border-radius: 8px;
+            padding: 16px 36px;
+            margin: 12px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
+            transition: all 0.3s;
+            box-shadow: 0 0 30px rgba(139, 61, 255, 0.5);
         }
-        .error { color: var(--red); margin: 20px; }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 50px rgba(139, 61, 255, 0.8);
+        }
+
+        #status {
+            margin-top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
-    <h1>Saturn DEX</h1>
-    <p>Perpetual Futures & Prediction Markets on Solana</p>
-    
-    <button onclick="openWallet()">🔌 Connect Wallet (Phantom / Backpack)</button>
-    <button onclick="placeOrderDemo()">🚀 Place Test Order</button>
 
-    <div id="status" style="margin-top:20px; font-family: monospace;"></div>
+    <div class="space-bg">
+        <div class="saturn-container">
+            <div class="saturn"></div>
+            <div class="rings"></div>
+            <div class="moon moon1"></div>
+            <div class="moon moon2"></div>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>Saturn DEX</h1>
+        <p>Perpetual Futures & Prediction Markets on Solana</p>
+        
+        <div>
+            <button class="btn" onclick="connectWallet()">🔌 Connect Wallet (Phantom / Backpack)</button>
+            <button class="btn" onclick="placeTestOrder()">🚀 Place Test Perp Order</button>
+        </div>
+
+        <div id="status"></div>
+    </div>
 
     <script>
         let isConnected = false;
+        let publicKey = null;
 
-        async function openWallet() {
+        async function connectWallet() {
             const status = document.getElementById('status');
+            let wallet = null;
+
             if (window.solana && window.solana.isPhantom) {
-                try {
-                    await window.solana.connect();
-                    isConnected = true;
-                    status.innerHTML = '✅ Wallet Connected! (Phantom)';
-                    status.style.color = '#00e676';
-                } catch (e) {
-                    status.innerHTML = '❌ Connection cancelled';
-                }
+                wallet = window.solana;
             } else if (window.backpack) {
-                try {
-                    await window.backpack.connect();
-                    isConnected = true;
-                    status.innerHTML = '✅ Wallet Connected! (Backpack)';
-                    status.style.color = '#00e676';
-                } catch (e) {
-                    status.innerHTML = '❌ Connection cancelled';
-                }
+                wallet = window.backpack;
             } else {
                 status.innerHTML = '❌ Please install Phantom or Backpack wallet';
                 status.style.color = '#ff3d71';
+                return;
+            }
+
+            try {
+                const resp = await wallet.connect();
+                publicKey = resp.publicKey;
+                isConnected = true;
+                status.innerHTML = `✅ Connected: ${publicKey.toString().slice(0,6)}...${publicKey.toString().slice(-4)}`;
+                status.style.color = '#00e676';
+            } catch (err) {
+                status.innerHTML = '❌ Connection cancelled or failed';
+                status.style.color = '#ff3d71';
             }
         }
 
-        function placeOrderDemo() {
+        function placeTestOrder() {
             const status = document.getElementById('status');
             if (!isConnected) {
-                status.innerHTML = 'Please connect wallet first';
+                status.innerHTML = 'Please connect your wallet first';
                 status.style.color = '#ff3d71';
                 return;
             }
-            status.innerHTML = '✅ Test order ready (real Drift coming next)';
+            status.innerHTML = '🚀 Test perp order prepared (real Drift integration next)';
             status.style.color = '#00e676';
         }
 
-        // Simple live price demo
-        async function showPrices() {
-            try {
-                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
-                const data = await res.json();
-                const status = document.getElementById('status');
-                status.innerHTML += `<br>BTC: $${data.bitcoin.usd} | ETH: $${data.ethereum.usd} | SOL: $${data.solana.usd}`;
-            } catch(e) {}
-        }
-
-        window.onload = showPrices;
+        // Gentle background animation boost
+        window.onload = () => {
+            console.log("Saturn DEX loaded with animated planet background");
+        };
     </script>
 </body>
 </html>
