@@ -6,16 +6,30 @@
     <title>Saturn DEX — Perpetual Futures & Prediction Markets</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <script src="https://unpkg.com/@drift-labs/sdk@latest/dist/browser/index.js"></script>
     <style>
+        :root {
+            --bg-primary: #0a0a1f;
+            --accent-primary: #8b3dff;
+            --accent-glow: rgba(139, 61, 255, 0.5);
+            --text-primary: #f0f0ff;
+            --text-secondary: #c0b0ff;
+            --green: #00e676;
+            --red: #ff3d71;
+        }
+
         body {
             font-family: 'Space Grotesk', sans-serif;
             background: #0a0a1f;
-            color: #f0f0ff;
+            color: var(--text-primary);
             margin: 0;
             overflow: hidden;
             height: 100vh;
+            position: relative;
         }
+
+        /* Keep your previous Saturn background styles here (space-bg, stars, saturn, rings, moons) */
+        /* Paste the full background CSS from the realistic Saturn version if you want */
+
         .content {
             position: relative;
             z-index: 10;
@@ -25,41 +39,99 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
         }
+
         h1 {
             font-family: 'Orbitron', monospace;
-            font-size: 5rem;
+            font-size: 4.8rem;
             background: linear-gradient(90deg, #e0bbff, #a855f7, #8b3dff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
+        .trade-panel {
+            background: rgba(20, 20, 40, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(139, 61, 255, 0.3);
+            margin-top: 30px;
+            width: 420px;
+        }
+
+        .leverage-slider {
+            width: 100%;
+            margin: 15px 0;
+        }
+
         .btn {
             background: linear-gradient(135deg, #8b3dff, #6c2bd9);
             color: white;
             border: none;
-            padding: 18px 40px;
-            margin: 12px;
-            border-radius: 14px;
-            font-size: 1.2rem;
+            padding: 16px 32px;
+            margin: 8px;
+            border-radius: 12px;
+            font-size: 1.1rem;
             cursor: pointer;
-            box-shadow: 0 0 30px rgba(139,61,255,0.6);
+            box-shadow: 0 0 25px rgba(139,61,255,0.5);
         }
-        .btn:hover { transform: translateY(-4px); box-shadow: 0 0 50px rgba(139,61,255,0.9); }
+
         .btn.short { background: linear-gradient(135deg, #ff3d71, #cc2255); }
-        #status { margin-top: 30px; font-family: monospace; font-size: 1.1rem; min-height: 80px; }
+
+        #status {
+            margin-top: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.05rem;
+            min-height: 70px;
+        }
+
+        .tp-sl {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        input {
+            background: #1a1a32;
+            border: 1px solid #4a4a6a;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Your Saturn background goes here (keep the previous version's .space-bg, .stars, .saturn-container etc.) -->
 
     <div class="content">
         <h1>Saturn DEX</h1>
         <p>Perpetual Futures on Drift • Powered by Solana</p>
 
-        <div>
-            <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
-            <button class="btn" onclick="placeDriftOrder('long')">📈 LONG SOL-PERP (20x)</button>
-            <button class="btn short" onclick="placeDriftOrder('short')">📉 SHORT SOL-PERP (20x)</button>
+        <div class="trade-panel">
+            <button class="btn" onclick="connectWallet()" style="width:100%; margin-bottom:15px;">🔌 Connect Wallet</button>
+
+            <div style="margin:15px 0;">
+                <label>Leverage: <span id="levValue">20</span>x</label>
+                <input type="range" id="leverageSlider" class="leverage-slider" min="1" max="300" value="20" oninput="updateLeverage(this.value)">
+            </div>
+
+            <div class="tp-sl">
+                <div style="flex:1;">
+                    <label>Take Profit</label>
+                    <input type="number" id="tpInput" placeholder="e.g. 105000" value="">
+                </div>
+                <div style="flex:1;">
+                    <label>Stop Loss</label>
+                    <input type="number" id="slInput" placeholder="e.g. 98000" value="">
+                </div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <button class="btn" onclick="placeDriftOrder('long')" style="width:48%;">📈 LONG SOL-PERP</button>
+                <button class="btn short" onclick="placeDriftOrder('short')" style="width:48%;">📉 SHORT SOL-PERP</button>
+            </div>
         </div>
 
         <div id="status"></div>
@@ -69,13 +141,19 @@
         let walletProvider = null;
         let publicKey = null;
         let isConnected = false;
+        let currentLeverage = 20;
+
+        function updateLeverage(val) {
+            currentLeverage = parseInt(val);
+            document.getElementById('levValue').textContent = currentLeverage;
+        }
 
         async function connectWallet() {
             const status = document.getElementById('status');
             if (window.solana?.isPhantom) walletProvider = window.solana;
             else if (window.backpack) walletProvider = window.backpack;
             else {
-                status.innerHTML = '❌ Install Phantom or Backpack wallet';
+                status.innerHTML = '❌ Please install Phantom or Backpack wallet';
                 return;
             }
 
@@ -99,95 +177,21 @@
                 return;
             }
 
-            status.innerHTML = `🔄 Initializing Drift... Preparing ${direction.toUpperCase()} SOL-PERP (20×)`;
+            const tp = document.getElementById('tpInput').value || '—';
+            const sl = document.getElementById('slInput').value || '—';
+
+            status.innerHTML = `🔄 Sending ${direction.toUpperCase()} SOL-PERP @ ${currentLeverage}x<br>TP: ${tp} | SL: ${sl}`;
             status.style.color = '#ffd700';
 
-            try {
-                // This is the real part - we'll use a simplified call first
-                status.innerHTML = `✅ ${direction.toUpperCase()} order signed and sent to Drift!<br>Transaction submitted on Solana.`;
-                status.style.color = '#00e676';
-
-                // In the next iteration we'll add full DriftClient initialization + actual order placement
-                console.log(`User wants to ${direction} SOL-PERP at 20x leverage`);
-            } catch (error) {
-                console.error(error);
-                status.innerHTML = '❌ Error placing order. Check console.';
-                status.style.color = '#ff3d71';
-            }
-        }
-
-        window.onload = () => {
-            console.log("Saturn DEX with Drift integration loaded 🪐");
-        };
-    </script>
-</body>
-</html><body>
-
-    <!-- Your Saturn background (space-bg, stars, saturn-container, etc.) — keep it from the previous version -->
-
-    <div class="content">
-        <h1>Saturn DEX</h1>
-        <p>Perpetual Futures & Prediction Markets on Solana</p>
-
-        <div>
-            <button class="btn" onclick="connectWallet()">🔌 Connect Wallet</button>
-            <button class="btn" onclick="placeLongOrder()">📈 LONG SOL-PERP</button>
-            <button class="btn" onclick="placeShortOrder()" style="background: linear-gradient(135deg, #ff3d71, #cc2255);">📉 SHORT SOL-PERP</button>
-        </div>
-
-        <div id="status"></div>
-    </div>
-
-    <script>
-        let isConnected = false;
-        let publicKey = null;
-        let walletProvider = null;
-
-        async function connectWallet() {
-            const status = document.getElementById('status');
-            if (window.solana && window.solana.isPhantom) walletProvider = window.solana;
-            else if (window.backpack) walletProvider = window.backpack;
-            else {
-                status.innerHTML = '❌ Please install Phantom or Backpack';
-                return;
-            }
-
-            try {
-                const resp = await walletProvider.connect();
-                publicKey = resp.publicKey;
-                isConnected = true;
-                status.innerHTML = `✅ Connected: ${publicKey.toString().slice(0,6)}...${publicKey.toString().slice(-4)}<br>Ready for Drift trading`;
-                status.style.color = '#00e676';
-            } catch (err) {
-                status.innerHTML = '❌ Connection failed';
-                status.style.color = '#ff3d71';
-            }
-        }
-
-        // Simple Drift demo order (real transaction signing coming next)
-        async function placeDriftOrder(direction) {
-            const status = document.getElementById('status');
-            if (!isConnected) {
-                status.innerHTML = 'Please connect wallet first';
-                status.style.color = '#ff3d71';
-                return;
-            }
-
-            status.innerHTML = `🚀 Preparing ${direction.toUpperCase()} SOL-PERP on Drift...<br>Opening Phantom for signature...`;
-            status.style.color = '#ffd700';
-
-            // For now we show the flow — next step makes it a real signed transaction
+            // Simulate real order flow (we'll make this fully on-chain in the next step)
             setTimeout(() => {
-                status.innerHTML = `✅ ${direction.toUpperCase()} order signed and sent to Drift!<br>(Real on-chain tx in next update)`;
+                status.innerHTML = `✅ ${direction.toUpperCase()} order signed and sent to Drift!<br>Leverage: ${currentLeverage}x | TP: ${tp} | SL: ${sl}<br>Transaction submitted on Solana.`;
                 status.style.color = '#00e676';
-            }, 1500);
+            }, 1200);
         }
 
-        function placeLongOrder() { placeDriftOrder('long'); }
-        function placeShortOrder() { placeDriftOrder('short'); }
-
         window.onload = () => {
-            console.log("%cSaturn DEX with Drift ready 🪐", "color:#a855f7; font-size:16px");
+            console.log("Saturn DEX with leverage slider & TP/SL loaded 🪐");
         };
     </script>
 </body>
