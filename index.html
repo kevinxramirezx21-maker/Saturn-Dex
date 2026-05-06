@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saturn DEX — The Next-Gen Perp DEX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <style>
+        /* === MINIMAL CSS TO MAKE IT LOOK GOOD AND WORK === */
+        :root {
+            --bg-primary: #080810;
+            --accent-primary: #8b3dff;
+            --text-primary: #f0f0ff;
+            --text-secondary: #a0a0c0;
+            --green: #00e676;
+            --red: #ff3d71;
+        }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 { font-family: 'Orbitron', monospace; color: var(--accent-primary); }
+        button {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .error { color: var(--red); margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Saturn DEX</h1>
+    <p>Perpetual Futures & Prediction Markets on Solana</p>
+    
+    <button onclick="openWallet()">🔌 Connect Wallet (Phantom / Backpack)</button>
+    <button onclick="placeOrderDemo()">🚀 Place Test Order</button>
+
+    <div id="status" style="margin-top:20px; font-family: monospace;"></div>
+
+    <script>
+        let isConnected = false;
+
+        async function openWallet() {
+            const status = document.getElementById('status');
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    await window.solana.connect();
+                    isConnected = true;
+                    status.innerHTML = '✅ Wallet Connected! (Phantom)';
+                    status.style.color = '#00e676';
+                } catch (e) {
+                    status.innerHTML = '❌ Connection cancelled';
+                }
+            } else if (window.backpack) {
+                try {
+                    await window.backpack.connect();
+                    isConnected = true;
+                    status.innerHTML = '✅ Wallet Connected! (Backpack)';
+                    status.style.color = '#00e676';
+                } catch (e) {
+                    status.innerHTML = '❌ Connection cancelled';
+                }
+            } else {
+                status.innerHTML = '❌ Please install Phantom or Backpack wallet';
+                status.style.color = '#ff3d71';
+            }
+        }
+
+        function placeOrderDemo() {
+            const status = document.getElementById('status');
+            if (!isConnected) {
+                status.innerHTML = 'Please connect wallet first';
+                status.style.color = '#ff3d71';
+                return;
+            }
+            status.innerHTML = '✅ Test order ready (real Drift coming next)';
+            status.style.color = '#00e676';
+        }
+
+        // Simple live price demo
+        async function showPrices() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd');
+                const data = await res.json();
+                const status = document.getElementById('status');
+                status.innerHTML += `<br>BTC: $${data.bitcoin.usd} | ETH: $${data.ethereum.usd} | SOL: $${data.solana.usd}`;
+            } catch(e) {}
+        }
+
+        window.onload = showPrices;
+    </script>
+</body>
+</html>
